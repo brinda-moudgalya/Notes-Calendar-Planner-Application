@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>calendar</title>
+
+        <link rel="stylesheet" href="styleForCalendar.css">
+        <link rel="stylesheet" href="styleForSidebar.css">
+    </head>
+    <body>
+
+        <div class="sidebar">
+            <header>MySchoolLife</header>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="planner.html">Planner</a></li>
+                <li><a href="calendar.html">Calendar</a></li>
+                <li><a href="notes.html">Notes</a></li>
+                <li><a href="links.html">Links</a></li>
+            </ul>
+        </div>
+        
+        <div class="maincontent">
+            <div id="container">
+                <div id="header">
+                    <div id="monthDisplay"></div>
+                    <div>
+                        <!-- buttons for switching between months -->
+                        <button id="backButton">Back</button>
+                        <button id="nextButton">Next</button>
+                    </div>
+                </div>
+                <!-- the days of the week, on top of the page -->
+                <div id="weekdays">
+                    <div>Sunday</div>
+                    <div>Monday</div>
+                    <div>Tuesday</div>
+                    <div>Wednesday</div>
+                    <div>Thursday</div>
+                    <div>Friday</div>
+                    <div>Saturday</div>
+                </div>
+
+                <div id="calendar"></div>
+            </div>
+
+
+        </div>
+            <script type="module">
+                // Import the functions you need from the SDKs you need
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+                import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-analytics.js";
+                // TODO: Add SDKs for Firebase products that you want to use
+                // https://firebase.google.com/docs/web/setup#available-libraries
+
+                // Your web app's Firebase configuration
+                // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                const firebaseConfig = {
+                apiKey: "AIzaSyA52HtceMEx3YRC22l1oWYLGTxO_6sJWp8",
+                authDomain: "computer-science-ia-37b6d.firebaseapp.com",
+                databaseURL: "https://computer-science-ia-37b6d-default-rtdb.firebaseio.com",
+                projectId: "computer-science-ia-37b6d",
+                storageBucket: "computer-science-ia-37b6d.appspot.com",
+                messagingSenderId: "331276916000",
+                appId: "1:331276916000:web:8eac39527f6b0bd746f345",
+                measurementId: "G-BLDG8CGRK5"
+                };
+
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+
+                import {getDatabase, ref, get, set, child, update, remove, onValue}
+                from "https://www.gstatic.com/firebasejs/9.6.7/firebase-database.js";
+
+                const db = getDatabase();
+
+
+                
+
+                // changing 'nav' would change the month from current to previous/next months
+                let nav = 0;
+                let clicked = null;
+
+                // global variables:
+                const calendar = document.getElementById('calendar');
+                const backDrop = document.getElementById('modalBackDrop');
+                const eventTitleInput = document.getElementById('eventTitleInput');
+                const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+                //functions:
+                
+                // what happens when the page is reloaded
+                function load() {
+                    const dt = new Date();
+
+                    if(nav !== 0) {
+                        dt.setMonth(new Date().getMonth() + nav, 1);
+                    }
+
+                    // getting the current date and setting each value as a variable
+                    const day = dt.getDate();
+                    const month = dt.getMonth();
+                    const year = dt.getFullYear();
+
+                    // ensures that each month will show up  
+                    const firstDayOfMonth = new Date(year, month, 1);
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    
+                    // how to show each value: day, year, month, and date
+                    const dateString = firstDayOfMonth.toLocaleDateString('en-us', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric'
+                    });
+                    const paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
+
+                    // text displayed inside the box
+                    document.getElementById('monthDisplay').innerText = 
+                    `${dt.toLocaleDateString('en-us', {month: 'long'})} ${year}`;
+                    
+                    calendar.innerHTML = '';
+
+                    // adds a box for each day in the current month
+                    for(let i = 1; i <= paddingDays + daysInMonth; i++){
+                        const daySquare = document.createElement('div');
+                        daySquare.classList.add('day');
+
+                        // how many days in month (rest are 'padding days')
+                        const dayString = `${month + 1}/${i - paddingDays}/${year}`;
+
+                        // what date to display on each box
+                        if (i > paddingDays) {
+                            daySquare.innerText = i - paddingDays;
+
+                            var eventForDay;
+                            if (i - paddingDays === day && nav === 0) {
+                                daySquare.id = 'currentDay';
+                            }
+                        } else {
+                            daySquare.classList.add('padding');
+                        }
+                        calendar.appendChild(daySquare);
+                    }
+                }
+
+                function initButtons() {
+                    document.getElementById('nextButton').addEventListener('click', () => {
+                        nav++;
+                        load();
+                    });
+
+                    document.getElementById('backButton').addEventListener('click', () => {
+                        nav--;
+                        load();
+                    });
+                }
+
+                initButtons();
+                load();
+
+            </script>
+    </body>
+</html>

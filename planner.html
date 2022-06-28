@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>planner</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="styleForSidebar.css">
+        <link rel="stylesheet" href="styleForPlanner.css">
+    </head>
+    <body>
+        
+        <div id="container">
+            <div class="sidebar">
+                <header>MySchoolLife</header>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="planner.html">Planner</a></li>
+                    <li><a href="calendar.html">Calendar</a></li>
+                    <li><a href="notes.html">Notes</a></li>
+                    <li><a href="links.html">Links</a></li>
+                </ul>
+            </div>
+            <div class="maincontent">
+                <div id="pagetitle">
+                    <h1>Planner</h1>
+                </div>
+                <div>
+                    <!-- button made in html with javascript code -->
+                    <button id="addHomework">Add Homework</button>
+                    <script type="text/javascript">
+                        document.getElementById("addHomework").onclick = function () {
+                            location.href = "addHomework.html";
+                        };
+                    </script>
+                </div>
+                <div id="contentOfHome">
+                    <!-- table title -->
+                    <div id="homeworkNamesTitle">
+                        MY HOMEWORK:
+                        <br>
+                        <br>
+                    </div>
+                    <!-- table itself that displays the data from the database -->
+                    <div>
+                        <table id="homeworkNamesOnPage">
+                            <thead>
+                                <!-- <th id="shortestInput"></th> -->
+                                <th id="shortInput"></th>
+                                <th id="longInput"></th>
+                                <tbody id="body"></tbody>
+                            </thead>
+                        </table>
+                    </div>
+                    <!-- table IN THE DESCRIPTION BOX -->
+                    <div>
+                        <table id="homeworkNamesOnDisplay">
+                            <thead id="descriptionInput">
+                                <th></th>
+                                <th></th>
+                                <tbody id="body2"></tbody>
+                            </thead>
+                        </table>
+                    </div>
+                    <!-- text inside the description box -->
+                    <div id="newEventModal">
+                        <th><b>Description</b></th>
+                        <button id="cancelButton1">x</button>
+                        <script type="text/javascript">
+                            // button that links back to main planner page
+                            document.getElementById("cancelButton1").onclick = function () {
+                                location.href = "planner.html";
+                            };
+                        </script>
+                        <br><br><br>
+                      </div>
+                      <div id="descriptionBackground"></div>
+
+
+                </div>
+
+                <script type="module">
+                    // Import the functions you need from the SDKs you need
+                    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+                    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-analytics.js";
+                    // TODO: Add SDKs for Firebase products that you want to use
+                    // https://firebase.google.com/docs/web/setup#available-libraries
+                
+                    // Your web app's Firebase configuration
+                    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                    const firebaseConfig = {
+                    apiKey: "AIzaSyA52HtceMEx3YRC22l1oWYLGTxO_6sJWp8",
+                    authDomain: "computer-science-ia-37b6d.firebaseapp.com",
+                    databaseURL: "https://computer-science-ia-37b6d-default-rtdb.firebaseio.com",
+                    projectId: "computer-science-ia-37b6d",
+                    storageBucket: "computer-science-ia-37b6d.appspot.com",
+                    messagingSenderId: "331276916000",
+                    appId: "1:331276916000:web:8eac39527f6b0bd746f345",
+                    measurementId: "G-BLDG8CGRK5"
+                    };
+                
+                    // Initialize Firebase
+                    const app = initializeApp(firebaseConfig);
+                    const analytics = getAnalytics(app);
+            
+                    import {getDatabase, ref, get, set, child, update, remove}
+                    from "https://www.gstatic.com/firebasejs/9.6.7/firebase-database.js";
+            
+                    const db = getDatabase();
+            
+                    // references:
+                    const newEventModal = document.getElementById('newEventModal');
+                    const backDrop = document.getElementById('descriptionBackground');
+                    var homeworkTitle = document.getElementById("homeworkTitleInput");
+                    var homeworkDescription = document.getElementById("homeworkDescriptionInput");
+                    var homeworkClass = document.getElementById("homeworkClassInput");
+                    var homeworkDueDate = document.getElementById("homeworkDueDateInput");
+                    var homeworkNamesOnPage = document.getElementById("homeworkNamesOnPage")
+                    var homeworkNamesOnDisplay = document.getElementById('homeworkNamesOnDisplay');
+
+
+                    var saveButton = document.getElementById("saveHomeworkButton");
+                    var cancelButton = document.getElementById("cancelHomeworkButton");
+                    var theNameOfTheHomework;
+            
+                    var homeworkNumber = 0;
+                    var tbody = document.getElementById('body');
+                    var tdescription = document.getElementById('body2');
+                    var counterForCreatingTable = 0;
+                    homeworkNamesOnPage.addEventListener('click', GetAllAssignmentDetailsOnce);
+                    tbody.addEventListener('dblclick', deleteHomework);
+
+                    
+                    // function that creates the table itself (adds rows dynamically)
+                    function CreateTheTable(name, date) {
+                            let trow = document.createElement("tr");
+                            theNameOfTheHomework = document.createElement('td');
+                            theNameOfTheHomework.id = "nameOfHomeworkSelected";
+                            let theDateOfTheHomework = document.createElement('td');
+
+                            theNameOfTheHomework.innerHTML = name;
+                            theDateOfTheHomework.innerHTML = date;
+
+                            trow.appendChild(theDateOfTheHomework);
+                            trow.appendChild(theNameOfTheHomework);
+                            
+
+                            tbody.appendChild(trow);
+
+                            var x = document.getElementsByTagName("homeworkNamesOnPage");
+                            
+                    }
+                    // takes an array and calls the TABLE function
+                    function AddAllHomeworkAssignmentsToPage(theListOfHomeworkNames) {
+                        homeworkNumber = 0;
+                        tbody.innerHTML = "";
+                        theListOfHomeworkNames.forEach(element => {
+                            CreateTheTable(element.HomeworkTitle, element.HomeworkDueDate);
+                        });
+                    }
+                    // creates the array of all the classes from the database
+                    function GetAllAssignmentsOnce(){
+                        const dbRef = ref(db);
+
+                        get(child(dbRef, "Homework"))
+                        // takes a snapshot of each homewoek assignment
+                        .then((snapshot) => {
+                            var homeworkArray = [];
+                            snapshot.forEach(childSnapshot => {
+                                homeworkArray.push(childSnapshot.val());
+                            });
+
+                            AddAllHomeworkAssignmentsToPage(homeworkArray);
+                        });
+                    }
+
+// next few methods are for showing the descriptions once class is clicked
+                    // creating the table in the box itself
+                    function CreateTheDescriptionTable(description) {
+                            let trow2 = document.createElement("tr");
+                            let theDescriptionOfTheHomework = document.createElement('td');
+
+                            theDescriptionOfTheHomework.innerHTML = description;
+
+                            trow2.appendChild(theDescriptionOfTheHomework);
+                            
+                            newEventModal.style.display = 'block';
+                            backDrop.style.display = 'block';
+                            tdescription.appendChild(trow2);
+
+                            newEventModal.appendChild(tdescription);
+
+                            var x = document.getElementsByTagName("homeworkNamesOnDisplay");
+                            
+                    }
+                    // takes an array and calls the TABLE function
+                    function AddClickedHomeworkDescription(theListOfHomeworkNames) {
+                        homeworkNumber = 0;
+                        tdescription.innerHTML = "";
+                        theListOfHomeworkNames.forEach(element => {
+                            CreateTheDescriptionTable(element.HomeworkDescription);
+                        });
+                    }
+                    // creates the array by taking snapshots
+                    function GetAllAssignmentDetailsOnce(e){
+                        const dbRef = ref(db);
+
+                        get(child(dbRef, "Homework"))
+                        .then((snapshot) => {
+                            var homeworkArray = [];
+                            snapshot.forEach(childSnapshot => {
+                                if(childSnapshot.val().HomeworkTitle === e.target.innerHTML){
+                                    homeworkArray.push(childSnapshot.val());
+                                }
+                            });
+                            AddClickedHomeworkDescription(homeworkArray);
+                        });
+                    }
+// upon reloading the window:
+                    window.onload = GetAllAssignmentsOnce;
+
+                    // deleting homework, which calls the function to delete data from the database
+                    function deleteHomework(e) {
+                        let nameOfHomeworkSelected = document.getElementById('nameOfHomeworkSelected');
+                        DeleteData(nameOfHomeworkSelected.innerText);
+                    }
+
+                    // delete data:
+                    function DeleteData(titleOfHomework) {
+                        remove(ref(db, "Homework/" + titleOfHomework))
+                        .then(() => {
+                            alert("'" + titleOfHomework + "' removed");
+                            location.reload();
+                        })
+                        .catch((error) => {
+                            alert("unsuccessful, error" + error);
+                        });
+                    }
+                    
+
+
+
+                </script>
+            </div>
+        </div>
+
+        
+
+    </body>
+</html>

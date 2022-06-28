@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>planner</title>
+
+        <link rel="stylesheet" href="styleForSidebar.css">
+        <link rel="stylesheet" href="styleForAddHomework.css">
+
+    </head>
+    <body>
+        
+        <div id="container">
+            <div class="sidebar">
+                <header>MySchoolLife</header>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="planner.html">Planner</a></li>
+                    <li><a href="calendar.html">Calendar</a></li>
+                    <li><a href="notes.html">Notes</a></li>
+                    <li><a href="links.html">Links</a></li>
+                </ul>
+            </div>
+            <div class="maincontent">
+                <div id="pagetitle">
+                    <h1>Add Homework</h1>
+                </div>
+                <div>
+                    <input id="homeworkTitleInput" placeholder="Homework Title"/>
+                    <input id="homeworkDescriptionInput" placeholder="Homework Description"/>
+                    
+<!-- input with dropdown calendar -->
+                    <input id="homeworkDueDateInput" type="date"/>
+                </div>
+                <div>
+<!-- SAVE HOMEWORK TO CLOUD DATABASE AND THEN EXIT PAGE -->
+                    <button id="saveHomeworkButton">Save</button>
+                    <button id="cancelHomeworkButton">Cancel</button>
+                    <script type="text/javascript">
+                        document.getElementById("cancelHomeworkButton").onclick = function () {
+                            location.href = "planner.html";
+                        };
+                    </script>
+                </div>
+
+                <script type="module">
+                    // Import the functions you need from the SDKs you need
+                    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+                    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-analytics.js";
+                    // TODO: Add SDKs for Firebase products that you want to use
+                    // https://firebase.google.com/docs/web/setup#available-libraries
+                  
+                    // Your web app's Firebase configuration
+                    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                    const firebaseConfig = {
+                      apiKey: "AIzaSyA52HtceMEx3YRC22l1oWYLGTxO_6sJWp8",
+                      authDomain: "computer-science-ia-37b6d.firebaseapp.com",
+                      databaseURL: "https://computer-science-ia-37b6d-default-rtdb.firebaseio.com",
+                      projectId: "computer-science-ia-37b6d",
+                      storageBucket: "computer-science-ia-37b6d.appspot.com",
+                      messagingSenderId: "331276916000",
+                      appId: "1:331276916000:web:8eac39527f6b0bd746f345",
+                      measurementId: "G-BLDG8CGRK5"
+                    };
+                  
+                    // Initialize Firebase
+                    const app = initializeApp(firebaseConfig);
+                    const analytics = getAnalytics(app);
+            
+                    import {getDatabase, ref, get, set, child, update, remove}
+                    from "https://www.gstatic.com/firebasejs/9.6.7/firebase-database.js";
+            
+                    const db = getDatabase();
+            
+                    // references:
+                    var homeworkTitle = document.getElementById("homeworkTitleInput");
+                    var homeworkDescription = document.getElementById("homeworkDescriptionInput");
+                    var homeworkDueDate = document.getElementById("homeworkDueDateInput");
+            
+                    var saveButton = document.getElementById("saveHomeworkButton");
+                    var cancelButton = document.getElementById("cancelHomeworkButton");
+            
+            
+                    // save homework function:
+                    function SaveHomework(){
+                        const dbref = ref(db);
+                        get(child(dbref,"Homework/" + homeworkTitle.value)).then((snapshot) => {
+                            // check if snapshot exists, if it does, then alert user
+                            if(snapshot.exists()) {
+                                alert("You already have homework called \"" + homeworkTitle.value + "\".")
+                            }
+                            // otherwise, save data
+                            else{
+                                set(ref(db, "Homework/" + homeworkTitle.value), {
+                                    HomeworkTitle: homeworkTitle.value,
+                                    HomeworkDescription: homeworkDescription.value,
+                                    HomeworkDueDate: homeworkDueDate.value
+                                })
+                                // change page
+                                .then(() => {
+                                    location.href = "planner.html";
+                                })
+                                .catch((error) => {
+                                    alert("unsuccessful, error" + error);
+                                });
+                                    }
+
+                                })
+                        .catch((error) => {
+                            alert("Unsuccessful, error" + error);
+                        });
+                    }
+
+                    // assign events to btns:
+                    saveButton.addEventListener('click', SaveHomework);  
+                </script>
+            </div>
+        </div>
+
+    </body>
+</html>

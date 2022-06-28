@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>class</title>
+
+        <link rel="stylesheet" href="styleForSidebar.css">
+        <link rel="stylesheet" href="styleForAddClass.css">
+    </head>
+    <body>
+        <div id="container">
+            <div class="sidebar">
+                <header>MySchoolLife</header>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="planner.html">Planner</a></li>
+                    <li><a href="calendar.html">Calendar</a></li>
+                    <li><a href="notes.html">Notes</a></li>
+                    <li><a href="links.html">Links</a></li>
+                </ul>
+            </div>
+            <div class="maincontent">
+                <div id="pagetitle">
+                    <h1>Add New Classes</h1>
+                </div>
+                <div>
+                    <!-- data from these inputs are stored in the database -->
+                    <input id="newClassName" placeholder="Class Name"/>
+                    <input id="newClassColor" placeholder="Color" type="color">
+                </div>
+                <div>
+                    <button id="saveClassButton">Save</button>
+                    </script> -->
+                    <button id="cancelClassButton">Cancel</button>
+                    <script type="text/javascript">
+                        document.getElementById("cancelClassButton").onclick = function () {
+                            location.href = "index.html";
+                        };
+                    </script>
+                </div>
+                
+                <!-- database code -->
+                <script type="module">
+                    // import from Index.html
+                    // Import the functions you need from the SDKs you need
+                    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+                    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-analytics.js";
+                    // TODO: Add SDKs for Firebase products that you want to use
+                    // https://firebase.google.com/docs/web/setup#available-libraries
+                  
+                    // Your web app's Firebase configuration
+                    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                    const firebaseConfig = {
+                      apiKey: "AIzaSyA52HtceMEx3YRC22l1oWYLGTxO_6sJWp8",
+                      authDomain: "computer-science-ia-37b6d.firebaseapp.com",
+                      databaseURL: "https://computer-science-ia-37b6d-default-rtdb.firebaseio.com",
+                      projectId: "computer-science-ia-37b6d",
+                      storageBucket: "computer-science-ia-37b6d.appspot.com",
+                      messagingSenderId: "331276916000",
+                      appId: "1:331276916000:web:8eac39527f6b0bd746f345",
+                      measurementId: "G-BLDG8CGRK5"
+                    };
+                  
+                    // Initialize Firebase
+                    const app = initializeApp(firebaseConfig);
+                    const analytics = getAnalytics(app);
+            
+                    import {getDatabase, ref, get, set, child, update, remove}
+                    from "https://www.gstatic.com/firebasejs/9.6.7/firebase-database.js";
+            
+                    const db = getDatabase();
+            
+                    // references:
+                    var className = document.getElementById("newClassName");
+                    var classColor = document.getElementById("newClassColor");
+            
+                    var saveClass = document.getElementById("saveClassButton");
+                    var cancelClass = document.getElementById("cancelClassButton");
+            
+            
+                    // save class function:
+                    function SaveTheClass(){
+                        const dbref = ref(db);
+                        // get the snapshot
+                        get(child(dbref,"Classes Taken/" + className.value)).then((snapshot) => {
+                            // check if the class already exists
+                            if(snapshot.exists()) {
+                                alert("You already have a class called \"" + className.value + "\".")
+                            }
+                            // if not, then set the class name and class color to database
+                            else{
+                                set(ref(db, "Classes Taken/" + className.value), {
+                                    ClassName: className.value,
+                                    ClassColor: classColor.value,
+                                })
+                                .then(() => {
+                                    location.href = "index.html";
+                                })
+                                .catch((error) => {
+                                    alert("unsuccessful, error" + error);
+                                });
+                                    }
+
+                                })
+                        // catch the error
+                        .catch((error) => {
+                            alert("Unsuccessful, error" + error);
+                        });
+                    }
+
+                   
+                    // assign events to buttons:
+                    saveClass.addEventListener('click', SaveTheClass);
+                </script>
+
+
+                
+            </div>
+        </div>
+    </body>
+</html>

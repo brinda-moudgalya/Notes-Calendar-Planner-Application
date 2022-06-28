@@ -1,0 +1,12 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#links {
+    font-size: xx-large;
+    position: relative;
+    text-align: center;
+    top: 200px;
+    color: rgb(78, 74, 74);
+}
